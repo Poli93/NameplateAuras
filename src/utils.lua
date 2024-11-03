@@ -1,6 +1,6 @@
 -- luacheck: no max line length
 -- luacheck: globals LibStub WorldFrame format StaticPopup_Show StaticPopupDialogs CreateFrame debugprofilestop UIParent UNKNOWN DEFAULT_CHAT_FRAME
--- luacheck: globals OKAY YES NO ReloadUI GetPlayerInfoByGUID UnitName GetUnitName wipe C_Spell
+-- luacheck: globals OKAY YES NO ReloadUI GetPlayerInfoByGUID UnitName GetUnitName wipe C_Spell UnitIsPlayer
 
 local _, addonTable = ...;
 local L = LibStub("AceLocale-3.0"):GetLocale("NameplateAuras");
@@ -8,7 +8,7 @@ local SML = LibStub("LibSharedMedia-3.0");
 SML:Register("font", "NAuras_TeenBold", 		"Interface\\AddOns\\NameplateAuras\\media\\teen_bold.ttf", 255);
 SML:Register("font", "NAuras_TexGyreHerosBold", "Interface\\AddOns\\NameplateAuras\\media\\texgyreheros-bold-webfont.ttf", 255);
 local pairs, select, string_format, string_find = pairs, select, format, string.find;
-local GetSpellTexture, GetSpellInfo, GetPlayerInfoByGUID, GetUnitName, wipe = C_Spell.GetSpellTexture, C_Spell.GetSpellInfo, GetPlayerInfoByGUID, GetUnitName, wipe;
+local GetSpellTexture, GetSpellInfo, GetPlayerInfoByGUID, GetUnitName, wipe, UnitIsPlayer = C_Spell.GetSpellTexture, C_Spell.GetSpellInfo, GetPlayerInfoByGUID, GetUnitName, wipe, UnitIsPlayer;
 local UNIT_TYPE_PLAYER, UNIT_TYPE_NPC, UNIT_TYPE_PET = addonTable.UNIT_TYPE_PLAYER, addonTable.UNIT_TYPE_NPC, addonTable.UNIT_TYPE_PET;
 local p_unitNameByGuid = { };
 local p_unitTypeByGuid = { };
@@ -179,10 +179,22 @@ function addonTable.GetOrAddUnitNameByGuid(_unitGuid, _unitId)
 	end
 end
 
-function addonTable.GetUnitTypeByGuid(_unitGuid)
+function addonTable.GetUnitTypeByGuid(_unitGuid, _unitId)
 	local cachedType = p_unitTypeByGuid[_unitGuid];
 	if (cachedType ~= nil) then
 		return cachedType;
+	end
+
+	if (_unitGuid == nil) then
+		if (_unitId == nil) then
+			return UNIT_TYPE_NPC;
+		end
+
+		if (UnitIsPlayer(_unitId)) then
+			return UNIT_TYPE_PLAYER;
+		else
+			return UNIT_TYPE_NPC;
+		end
 	end
 
 	if (string_find(_unitGuid, "Player-") == 1) then

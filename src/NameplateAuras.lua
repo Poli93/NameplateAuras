@@ -1168,7 +1168,7 @@ do
 		local unitIsFriend = (UnitReaction("player", unitID) or 0) > 4; -- 4 = neutral
 		local unitIsPlayer = UnitIsPlayer(unitID);
 		local unitGUID = UnitGUID(unitID);
-		local unitType = GetUnitTypeByGuid(unitGUID);
+		local unitType = GetUnitTypeByGuid(unitGUID, unitID);
 
 		local iconGroupsToUpdate = {};
 		for iconGroupIndex, iconGroup in pairs(db.IconGroups) do
