@@ -67,10 +67,6 @@ addonTable.DR_TEXTURES = {
 	["taunt"] = [[Interface\AddOns\NameplateAuras\media\square-red.tga]],
 };
 
-addonTable.SHOW_ON_PLAYERS_AND_NPC = 1;
-addonTable.SHOW_ON_PLAYERS = 2;
-addonTable.SHOW_ON_NPC = 3;
-
 addonTable.SPITEFUL_NPC_ID_STRING = "174773";
 addonTable.SPITEFUL_SPELL_ID = 69861;
 
@@ -95,3 +91,7 @@ addonTable.EPIC_BG_ZONE_IDS = {
 addonTable.ATTACH_TYPE_NAMEPLATE = 1;
 addonTable.ATTACH_TYPE_HEALTHBAR = 2;
 addonTable.ATTACH_TYPE_TPTP = 3;
+
+addonTable.UNIT_TYPE_PLAYER = 1;
+addonTable.UNIT_TYPE_NPC = 2;
+addonTable.UNIT_TYPE_PET = 3;

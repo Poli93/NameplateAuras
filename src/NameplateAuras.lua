@@ -71,9 +71,10 @@ do
 	BORDER_TEXTURES = addonTable.BORDER_TEXTURES;
 end
 local ATTACH_TYPE_NAMEPLATE, ATTACH_TYPE_HEALTHBAR, ATTACH_TYPE_TPTP = addonTable.ATTACH_TYPE_NAMEPLATE, addonTable.ATTACH_TYPE_HEALTHBAR, addonTable.ATTACH_TYPE_TPTP;
+local UNIT_TYPE_PLAYER, UNIT_TYPE_NPC, UNIT_TYPE_PET = addonTable.UNIT_TYPE_PLAYER, addonTable.UNIT_TYPE_NPC, addonTable.UNIT_TYPE_PET;
 
 -- // utilities
-local Print, SpellTextureByID, SpellNameByID = addonTable.Print, addonTable.SpellTextureByID, addonTable.SpellNameByID;
+local Print, SpellTextureByID, SpellNameByID, GetUnitTypeByGuid = addonTable.Print, addonTable.SpellTextureByID, addonTable.SpellNameByID, addonTable.GetUnitTypeByGuid;
 
 local UpdateUnitAurasFull, UpdateUnitAurasIncremental;
 do
@@ -378,7 +379,6 @@ do
 	local GLOW_TYPE_NONE, GLOW_TYPE_ACTIONBUTTON, GLOW_TYPE_AUTOUSE, GLOW_TYPE_PIXEL, GLOW_TYPE_ACTIONBUTTON_DIM =
 		addonTable.GLOW_TYPE_NONE, addonTable.GLOW_TYPE_ACTIONBUTTON, addonTable.GLOW_TYPE_AUTOUSE, addonTable.GLOW_TYPE_PIXEL, addonTable.GLOW_TYPE_ACTIONBUTTON_DIM;
 	local AURA_SORT_MODE_CUSTOM = addonTable.AURA_SORT_MODE_CUSTOM;
-	local SHOW_ON_PLAYERS, SHOW_ON_NPC = addonTable.SHOW_ON_PLAYERS, addonTable.SHOW_ON_NPC;
 	local glowInfo = { };
 	local animationInfo = { };
 	local defaultCustomSortFunction = function(aura1, aura2) return aura1.spellName < aura2.spellName; end;
@@ -926,7 +926,7 @@ do
 	end
 	addonTable.UpdateAllNameplates = UpdateAllNameplates;
 
-	local function ProcAurasForNmplt_Filter(auraType, _auraData, unitIsFriend, dbEntry, unitIsPlayer, unitId, _iconGroupIndex)
+	local function ProcAurasForNmplt_Filter(auraType, _auraData, unitIsFriend, dbEntry, _unitType, unitId, _iconGroupIndex)
 		if (dbEntry == nil) then
 			return false;
 		end
@@ -947,9 +947,18 @@ do
 			return false;
 		end
 
-		local playerNpcMode = dbEntry.playerNpcMode;
-		if ((playerNpcMode == SHOW_ON_NPC and unitIsPlayer) or (playerNpcMode == SHOW_ON_PLAYERS and not unitIsPlayer)) then
-			return false;
+		if (_unitType == UNIT_TYPE_PLAYER) then
+			if (not dbEntry.showOnPlayers) then
+				return false;
+			end
+		elseif (_unitType == UNIT_TYPE_NPC) then
+			if (not dbEntry.showOnNpcs) then
+				return false;
+			end
+		elseif (_unitType == UNIT_TYPE_PET) then
+			if (not dbEntry.showOnPets) then
+				return false;
+			end
 		end
 
 		if (dbEntry.checkSpellID ~= nil and not dbEntry.checkSpellID[_auraData.spellId]) then
@@ -1043,7 +1052,7 @@ do
 		end
 	end
 
-	local function ProcAurasForNmplt_OnNewAuraEx(_auraData, unitIsFriend, frame, unitIsPlayer, unitId, _iconGroupsToUpdate)
+	local function ProcAurasForNmplt_OnNewAuraEx(_auraData, unitIsFriend, frame, _unitType, unitId, _iconGroupsToUpdate)
 		local auraType = _auraData.isHarmful and AURA_TYPE_DEBUFF or AURA_TYPE_BUFF;
 		local auraName = _auraData.name;
 		for iconGroupIndex, iconGroup in pairs(_iconGroupsToUpdate) do
@@ -1052,7 +1061,7 @@ do
 			local cache = spellCache[auraName];
 			if (cache ~= nil) then
 				for _, dbEntry in pairs(cache) do
-					if (ProcAurasForNmplt_Filter(auraType, _auraData, unitIsFriend, dbEntry, unitIsPlayer, unitId, iconGroupIndex)) then
+					if (ProcAurasForNmplt_Filter(auraType, _auraData, unitIsFriend, dbEntry, _unitType, unitId, iconGroupIndex)) then
 						AurasPerNameplate[frame][iconGroupIndex][tSize+1] = {
 							["duration"] = _auraData.duration,
 							["expires"] = _auraData.expirationTime,
@@ -1159,6 +1168,7 @@ do
 		local unitIsFriend = (UnitReaction("player", unitID) or 0) > 4; -- 4 = neutral
 		local unitIsPlayer = UnitIsPlayer(unitID);
 		local unitGUID = UnitGUID(unitID);
+		local unitType = GetUnitTypeByGuid(unitGUID);
 
 		local iconGroupsToUpdate = {};
 		for iconGroupIndex, iconGroup in pairs(db.IconGroups) do
@@ -1189,7 +1199,7 @@ do
 			local auras = PlayerAurasPerGuid[unitGUID];
 			if (auras ~= nil) then
 				for _, auraData in pairs(auras) do
-					ProcAurasForNmplt_OnNewAuraEx(auraData, unitIsFriend, frame, unitIsPlayer, unitID, iconGroupsToUpdate);
+					ProcAurasForNmplt_OnNewAuraEx(auraData, unitIsFriend, frame, unitType, unitID, iconGroupsToUpdate);
 				end
 			end
 

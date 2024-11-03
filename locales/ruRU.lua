@@ -84,9 +84,6 @@ L["options:auras:enabled-state:tooltip"] = [=[%s: аура не будет по�
 %s: показывать все ауры]=]
 L["options:auras:enabled-state-all"] = "Включено, показывать все ауры"
 L["options:auras:enabled-state-mineonly"] = "Включено, показывать только мои ауры"
-L["options:auras:show-on-npcs"] = "Показывать эту ауру только на НПС"
-L["options:auras:show-on-npcs-and-players"] = "Показывать эту ауру на игроках и НПС"
-L["options:auras:show-on-players"] = "Показывать эту ауру только на игроках"
 L["options:borders:BORDER_TYPE_BUILTIN"] = "Встроенный"
 L["options:borders:BORDER_TYPE_CUSTOM"] = "Пользовательский"
 L["options:borders:border-file-path"] = "Путь до файла текстуры границы (начинается с 'Interface\\')"

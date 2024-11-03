@@ -77,7 +77,9 @@ local function GetDefaultDBSpellEntry(enabledState, spellName, checkSpellID)
 		["checkSpellID"] =				checkSpellID,
 		["showOnFriends"] =				true,
 		["showOnEnemies"] =				true,
-		["playerNpcMode"] =				addonTable.SHOW_ON_PLAYERS_AND_NPC,
+		["showOnPlayers"] = 				true,
+		["showOnNpcs"] = 						true,
+		["showOnPets"] = 						true,
 		["showGlow"] =					nil,
 		["glowType"] =					addonTable.GLOW_TYPE_AUTOUSE,
 		["animationType"] =				addonTable.ICON_ANIMATION_TYPE_ALPHA,
@@ -1966,10 +1968,11 @@ local function GUICategory_4(index)
 	local selectedSpell = 0;
 	local dropdownMenuSpells = VGUI.CreateDropdownMenu2();
 	local spellArea, editboxAddSpell, buttonAddSpell, sliderSpellIconSizeWidth, dropdownSpellShowType, editboxSpellID, buttonDeleteSpell, checkboxShowOnFriends, checkboxAnimationRelative,
-		checkboxShowOnEnemies, checkboxPvPMode, checkboxEnabled, checkboxGlow, areaGlow, sliderGlowThreshold, areaIconSize, areaAuraType, areaIDs, checkboxGlowRelative,
+		checkboxShowOnEnemies, checkboxEnabled, checkboxGlow, areaGlow, sliderGlowThreshold, areaIconSize, areaAuraType, areaIDs, checkboxGlowRelative,
 		dropdownGlowType, areaAnimation, checkboxAnimation, dropdownAnimationType, sliderAnimationThreshold, sliderSpellIconSizeHeight;
 	local areaCustomBorder, checkboxCustomBorder, textboxCustomBorderPath, sliderCustomBorderSize, colorPickerCustomBorderColor, buttonExportSpell, areaTooltip, editboxSpellTooltip;
 	local areaIconGroups, dropdownIconGroups, checkboxConsolidate, checkboxOverrideSize, currentSpellTitle;
+	local checkboxPlayers, checkboxNpcs, checkboxPets;
 
 	local AuraTypesLocalization = {
 		[AURA_TYPE_BUFF] =		L["Buff"],
@@ -2052,13 +2055,9 @@ local function GUICategory_4(index)
 		else
 			checkboxEnabled:SetTriState(1);
 		end
-		if (spellInfo.playerNpcMode == addonTable.SHOW_ON_PLAYERS_AND_NPC) then
-			checkboxPvPMode:SetTriState(0);
-		elseif (spellInfo.playerNpcMode == addonTable.SHOW_ON_PLAYERS) then
-			checkboxPvPMode:SetTriState(1);
-		else
-			checkboxPvPMode:SetTriState(2);
-		end
+		checkboxPlayers:SetChecked(spellInfo.showOnPlayers);
+		checkboxNpcs:SetChecked(spellInfo.showOnNpcs);
+		checkboxPets:SetChecked(spellInfo.showOnPets);
 		if (spellInfo.showGlow == nil) then
 			checkboxGlow:SetTriState(0);
 			sliderGlowThreshold:Hide();
@@ -2729,27 +2728,45 @@ local function GUICategory_4(index)
 		table_insert(controls, checkboxShowOnEnemies);
 	end
 
-	-- // checkboxPvPMode
+	-- // checkboxPlayers
 	do
-		checkboxPvPMode = VGUI.CreateCheckBoxTristate();
-		checkboxPvPMode:SetTextEntries({
-			L["options:auras:show-on-npcs-and-players"],
-			addonTable.ColorizeText(L["options:auras:show-on-players"], 1, 0, 0),
-			addonTable.ColorizeText(L["options:auras:show-on-npcs"], 0, 1, 0),
-		});
-		checkboxPvPMode:SetOnClickHandler(function(self)
-			if (self:GetTriState() == 0) then
-				addonTable.db.CustomSpells2[selectedSpell].playerNpcMode = addonTable.SHOW_ON_PLAYERS_AND_NPC;
-			elseif (self:GetTriState() == 1) then
-				addonTable.db.CustomSpells2[selectedSpell].playerNpcMode = addonTable.SHOW_ON_PLAYERS;
-			else
-				addonTable.db.CustomSpells2[selectedSpell].playerNpcMode = addonTable.SHOW_ON_NPC;
-			end
+		checkboxPlayers = VGUI.CreateCheckBox();
+		checkboxPlayers:SetText(L["options:auras:show-on-players-1"]);
+		checkboxPlayers:SetOnClickHandler(function(_self)
+			addonTable.db.CustomSpells2[selectedSpell].showOnPlayers = _self:GetChecked();
 			addonTable.UpdateAllNameplates(false);
 		end);
-		checkboxPvPMode:SetParent(spellArea.controlsFrame);
-		checkboxPvPMode:SetPoint("TOPLEFT", 15, -75);
-		table_insert(controls, checkboxPvPMode);
+		checkboxPlayers:SetParent(spellArea.controlsFrame);
+		checkboxPlayers:SetPoint("TOPLEFT", checkboxShowOnEnemies, "TOPLEFT", 0, -20);
+		table_insert(controls, checkboxPlayers);
+
+	end
+
+	-- // checkboxNpcs
+	do
+		checkboxNpcs = VGUI.CreateCheckBox();
+		checkboxNpcs:SetText(L["options:auras:show-on-npcs-1"]);
+		checkboxNpcs:SetOnClickHandler(function(_self)
+			addonTable.db.CustomSpells2[selectedSpell].showOnNpcs = _self:GetChecked();
+			addonTable.UpdateAllNameplates(false);
+		end);
+		checkboxNpcs:SetParent(spellArea.controlsFrame);
+		checkboxNpcs:SetPoint("TOPLEFT", checkboxPlayers, "TOPLEFT", 0, -20);
+		table_insert(controls, checkboxNpcs);
+
+	end
+
+	-- // checkboxPets
+	do
+		checkboxPets = VGUI.CreateCheckBox();
+		checkboxPets:SetText(L["options:auras:show-on-pets"]);
+		checkboxPets:SetOnClickHandler(function(_self)
+			addonTable.db.CustomSpells2[selectedSpell].showOnPets = _self:GetChecked();
+			addonTable.UpdateAllNameplates(false);
+		end);
+		checkboxPets:SetParent(spellArea.controlsFrame);
+		checkboxPets:SetPoint("TOPLEFT", checkboxNpcs, "TOPLEFT", 0, -20);
+		table_insert(controls, checkboxPets);
 
 	end
 
@@ -2763,7 +2780,7 @@ local function GUICategory_4(index)
 			addonTable.UpdateAllNameplates(false);
 		end);
 		checkboxConsolidate:SetParent(spellArea.controlsFrame);
-		checkboxConsolidate:SetPoint("TOPLEFT", checkboxPvPMode, "BOTTOMLEFT", 0, 0);
+		checkboxConsolidate:SetPoint("TOPLEFT", checkboxPets, "BOTTOMLEFT", 0, 0);
 		table_insert(controls, checkboxConsolidate);
 	end
 

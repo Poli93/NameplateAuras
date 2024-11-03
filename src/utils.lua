@@ -7,9 +7,11 @@ local L = LibStub("AceLocale-3.0"):GetLocale("NameplateAuras");
 local SML = LibStub("LibSharedMedia-3.0");
 SML:Register("font", "NAuras_TeenBold", 		"Interface\\AddOns\\NameplateAuras\\media\\teen_bold.ttf", 255);
 SML:Register("font", "NAuras_TexGyreHerosBold", "Interface\\AddOns\\NameplateAuras\\media\\texgyreheros-bold-webfont.ttf", 255);
-local pairs, select, string_format = pairs, select, format;
+local pairs, select, string_format, string_find = pairs, select, format, string.find;
 local GetSpellTexture, GetSpellInfo, GetPlayerInfoByGUID, GetUnitName, wipe = C_Spell.GetSpellTexture, C_Spell.GetSpellInfo, GetPlayerInfoByGUID, GetUnitName, wipe;
+local UNIT_TYPE_PLAYER, UNIT_TYPE_NPC, UNIT_TYPE_PET = addonTable.UNIT_TYPE_PLAYER, addonTable.UNIT_TYPE_NPC, addonTable.UNIT_TYPE_PET;
 local p_unitNameByGuid = { };
+local p_unitTypeByGuid = { };
 
 addonTable.SpellTextureByID = setmetatable({
 	[197690] = GetSpellTexture(71),		-- // override for defensive stance
@@ -175,6 +177,26 @@ function addonTable.GetOrAddUnitNameByGuid(_unitGuid, _unitId)
 		p_unitNameByGuid[_unitGuid] = unitName;
 		return unitName;
 	end
+end
+
+function addonTable.GetUnitTypeByGuid(_unitGuid)
+	local cachedType = p_unitTypeByGuid[_unitGuid];
+	if (cachedType ~= nil) then
+		return cachedType;
+	end
+
+	if (string_find(_unitGuid, "Player-") == 1) then
+		p_unitTypeByGuid[_unitGuid] = UNIT_TYPE_PLAYER;
+		return UNIT_TYPE_PLAYER;
+	end
+
+	if (string_find(_unitGuid, "Pet-") == 1) then
+		p_unitTypeByGuid[_unitGuid] = UNIT_TYPE_PET;
+		return UNIT_TYPE_PET;
+	end
+
+	p_unitTypeByGuid[_unitGuid] = UNIT_TYPE_NPC;
+	return UNIT_TYPE_NPC;
 end
 
 -- // CoroutineProcessor

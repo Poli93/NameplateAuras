@@ -180,9 +180,6 @@ L["options:apps:dr:pvp"] = "PvP"
 L["options:apps:dr:pve"] = "PvE (stun only)"
 L["options:general:show-on-target-only"] = "Show auras on target's nameplate only"
 L["options:alpha:use-target-alpha-if-not-target-selected"] = "Display auras with target's alpha if no target selected"
-L["options:auras:show-on-npcs-and-players"] = "Show this aura on players and NPC"
-L["options:auras:show-on-players"] = "Show this aura on players only"
-L["options:auras:show-on-npcs"] = "Show this aura on NPC only"
 L["options:apps:spiteful"] = "Highlight Spiteful Shade (Spiteful M+ affix)";
 L["instance-type:arena"] = "Arenas"
 L["instance-type:none"] = "Open World"
@@ -258,5 +255,8 @@ L["options:size-and-position:anchor-frame:healthbar"] = "Healthbar";
 L["options:size-and-position:anchor-point-to-nameplate"] = "Anchor point";
 L["options:size-and-position:anchor-point-of-frame"] = "Anchor point of icons group";
 L["options:apps:dispellable-spells:instance-types"] = "Set the instance types in which dispelable auras will be displayed";
+L["options:auras:show-on-players-1"] = "Show on players";
+L["options:auras:show-on-npcs-1"] = "Show on NPCs";
+L["options:auras:show-on-pets"] = "Show on pets";
 
 --@end-debug@

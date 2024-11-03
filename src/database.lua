@@ -552,6 +552,22 @@ local migrations = {
             end
         end
     end,
+    [33] = function()
+        local db = addonTable.db;
+        for _, spellInfo in pairs(db.CustomSpells2) do
+            local playerNpcMode = spellInfo.playerNpcMode;
+            if (spellInfo.showOnPlayers == nil) then
+                spellInfo.showOnPlayers = (playerNpcMode == 1 or playerNpcMode == 2); -- SHOW_ON_PLAYERS_AND_NPC or SHOW_ON_PLAYERS
+            end
+            if (spellInfo.showOnNpcs == nil) then
+                spellInfo.showOnNpcs = (playerNpcMode == 1 or playerNpcMode == 3); -- SHOW_ON_PLAYERS_AND_NPC or SHOW_ON_NPC
+            end
+            if (spellInfo.showOnPets == nil) then
+                spellInfo.showOnPets = (playerNpcMode == 1 or playerNpcMode == 3); -- SHOW_ON_PLAYERS_AND_NPC or SHOW_ON_NPC
+            end
+            spellInfo.playerNpcMode = nil;
+        end
+    end,
 };
 
 local function FillInMissingEntriesIsSpells()
@@ -579,8 +595,14 @@ local function FillInMissingEntriesIsSpells()
             if (spellInfo.showOnEnemies == nil) then
                 spellInfo.showOnEnemies = true;
             end
-            if (spellInfo.playerNpcMode == nil) then
-                spellInfo.playerNpcMode = addonTable.SHOW_ON_PLAYERS_AND_NPC;
+            if (spellInfo.showOnPlayers == nil) then
+                spellInfo.showOnPlayers = true;
+            end
+            if (spellInfo.showOnNpcs == nil) then
+                spellInfo.showOnNpcs = true;
+            end
+            if (spellInfo.showOnPets == nil) then
+                spellInfo.showOnPets = true;
             end
             if (spellInfo.auraType == nil) then
                 spellInfo.auraType = AURA_TYPE_ANY;
